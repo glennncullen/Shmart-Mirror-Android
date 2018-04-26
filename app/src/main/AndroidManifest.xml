@@ -20,7 +20,8 @@
         </activity>
         <activity android:name=".WeatherActivity" />
         <activity android:name=".NewsActivity" />
-        <activity android:name=".NotesActivity"></activity>
+        <activity android:name=".NotesActivity" />
+        <activity android:name=".CameraActivity" />
     </application>
 
 </manifest>

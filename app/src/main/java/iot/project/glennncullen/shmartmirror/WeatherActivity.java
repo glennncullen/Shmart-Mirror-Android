@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -13,7 +15,11 @@ import org.json.JSONObject;
 
 public class WeatherActivity extends AppCompatActivity {
 
-    static final String LOG_TAG = MainActivity.class.getCanonicalName();
+    static final String LOG_TAG = WeatherActivity.class.getCanonicalName();
+
+    private Handler handler;
+
+    Button weatherLogoutBtn;
 
     TextView weatherDayLbl;
     TextView weatherTempLbl;
@@ -26,7 +32,7 @@ public class WeatherActivity extends AppCompatActivity {
     String icon;
     String day;
 
-    JSONObject weather;
+//    JSONObject weather;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -34,7 +40,16 @@ public class WeatherActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
 
+        handler = Handler.getInstance(getApplicationContext(), this);
         getSupportActionBar().setTitle("Weather");
+
+        weatherLogoutBtn = (Button) findViewById(R.id.weatherLogoutBtn);
+        weatherLogoutBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                logout();
+            }
+        });
 
         weatherDayLbl = (TextView) findViewById(R.id.weatherDayLbl);
         weatherTempLbl = (TextView) findViewById(R.id.weatherTempLbl);
@@ -45,24 +60,32 @@ public class WeatherActivity extends AppCompatActivity {
 
         weatherImg = (ImageView) findViewById(R.id.weatherImg);
 
-        Intent intent = getIntent();
-        if (intent != null) {
-            try {
-                weather = new JSONObject(intent.getStringExtra("weather"));
-            } catch (JSONException e) {
-                Log.e(LOG_TAG, "unable to create JSONObject with weather intent bundle");
-                e.printStackTrace();
-            }
-        }
+        Log.i(LOG_TAG, getClass().getSimpleName() + " instance:\t" + this.toString());
 
+//        Intent intent = getIntent();
+//        if (intent != null) {
+//            try {
+//                weather = new JSONObject(intent.getStringExtra("weather"));
+//            } catch (JSONException e) {
+//                Log.e(LOG_TAG, "unable to create JSONObject with weather intent bundle");
+//                e.printStackTrace();
+//            }
+//        }
+
+    }
+
+
+    // update based on callback from pi
+    public void update(JSONObject message){
+        Log.i(LOG_TAG, "Trying to update weather with: " + message.toString());
         try {
-            weatherTempLbl.setText((String) String.valueOf(weather.get("temperature")));
-            weatherDescriptionLbl.setText((String) weather.get("description"));
-            weatherLocationLbl.setText((String) weather.get("location"));
-            windSpeedLbl.setText((String) String.valueOf(weather.get("wind_speed")) + " kmph");
-            windDirectionLbl.setText((String) weather.get("wind_direction"));
-            day = (String) weather.get("day");
-            icon = (String) weather.get("icon");
+            weatherTempLbl.setText((String) String.valueOf(message.get("temperature")));
+            weatherDescriptionLbl.setText((String) message.get("description"));
+            weatherLocationLbl.setText((String) message.get("location"));
+            windSpeedLbl.setText((String) String.valueOf(message.get("wind_speed")) + " kmph");
+            windDirectionLbl.setText((String) message.get("wind_direction"));
+            day = (String) message.get("day");
+            icon = (String) message.get("icon");
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -153,10 +176,22 @@ public class WeatherActivity extends AppCompatActivity {
                 weatherImg.setImageDrawable(getApplicationContext().getDrawable(R.drawable.clear_day));
                 break;
         }
-
     }
 
     @Override
     public void onBackPressed(){
+    }
+
+
+    /**
+     * handle logout event
+     */
+    private void logout(){
+        try {
+            handler.publish(new JSONObject().put("logout", 1), "/iotappdev/logout/");
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, "Unable to create JSONObject for logout");
+            e.printStackTrace();
+        }
     }
 }
