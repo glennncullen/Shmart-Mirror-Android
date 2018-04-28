@@ -191,6 +191,9 @@ public class Handler {
      * Subscribes to /iotappdev/displays/
      * handles incoming data and starts relevant activities
      * as user switches between displays on the mirror
+     *
+     * disables inetraction with current activity
+     * while next activity is starting
      */
     private static void subscribeToDisplays(){
         try {
@@ -216,6 +219,22 @@ public class Handler {
                                             break;
                                         case "CameraFeed":
                                             activityInFocus.startActivity(new Intent(context ,CameraActivity.class));
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                    switch(activityInFocus.getClass().getSimpleName()){
+                                        case "NotesActivity":
+                                            ((NotesActivity) activityInFocus).disableInteraction();
+                                            break;
+                                        case "NewsActivity":
+                                            ((NewsActivity) activityInFocus).disableInteraction();
+                                            break;
+                                        case "WeatherActivity":
+                                            ((WeatherActivity) activityInFocus).disableInteraction();
+                                            break;
+                                        case "CameraAvtivity":
+                                            ((CameraActivity) activityInFocus).disableInteraction();
                                             break;
                                         default:
                                             break;

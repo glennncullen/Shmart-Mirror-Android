@@ -13,6 +13,8 @@ import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Objects;
+
 public class WeatherActivity extends AppCompatActivity {
 
     static final String LOG_TAG = WeatherActivity.class.getCanonicalName();
@@ -41,12 +43,13 @@ public class WeatherActivity extends AppCompatActivity {
         setContentView(R.layout.activity_weather);
 
         handler = Handler.getInstance(getApplicationContext(), this);
-        getSupportActionBar().setTitle("Weather");
+        Objects.requireNonNull(getSupportActionBar()).setTitle("Weather");
 
         weatherLogoutBtn = (Button) findViewById(R.id.weatherLogoutBtn);
         weatherLogoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                disableInteraction();
                 logout();
             }
         });
@@ -61,16 +64,6 @@ public class WeatherActivity extends AppCompatActivity {
         weatherImg = (ImageView) findViewById(R.id.weatherImg);
 
         Log.i(LOG_TAG, getClass().getSimpleName() + " instance:\t" + this.toString());
-
-//        Intent intent = getIntent();
-//        if (intent != null) {
-//            try {
-//                weather = new JSONObject(intent.getStringExtra("weather"));
-//            } catch (JSONException e) {
-//                Log.e(LOG_TAG, "unable to create JSONObject with weather intent bundle");
-//                e.printStackTrace();
-//            }
-//        }
 
     }
 
@@ -182,6 +175,12 @@ public class WeatherActivity extends AppCompatActivity {
     public void onBackPressed(){
     }
 
+    /**
+     * disable interaction with activity
+     */
+    public void disableInteraction(){
+        weatherLogoutBtn.setEnabled(false);
+    }
 
     /**
      * handle logout event

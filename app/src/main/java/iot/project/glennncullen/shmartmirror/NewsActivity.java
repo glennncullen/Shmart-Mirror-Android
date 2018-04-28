@@ -1,9 +1,11 @@
 package iot.project.glennncullen.shmartmirror;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -12,6 +14,8 @@ import android.widget.Button;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.Objects;
 
 public class NewsActivity extends AppCompatActivity {
 
@@ -29,12 +33,14 @@ public class NewsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_news);
 
         handler = Handler.getInstance(getApplicationContext(), this);
-        getSupportActionBar().setTitle("News");
+        Objects.requireNonNull(getSupportActionBar()).setTitle("News");
 
         newsLogoutBtn = (Button) findViewById(R.id.newsLogoutBtn);
         newsLogoutBtn.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("ClickableViewAccessibility")
             @Override
             public void onClick(View v) {
+                disableInteraction();
                 logout();
             }
         });
@@ -58,6 +64,13 @@ public class NewsActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed(){
+    }
+
+    /**
+     * disable interaction with activity
+     */
+    public void disableInteraction(){
+        newsLogoutBtn.setEnabled(false);
     }
 
     /**

@@ -9,6 +9,8 @@ import android.widget.Button;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Objects;
+
 public class CameraActivity extends AppCompatActivity {
 
     static final String LOG_TAG = CameraActivity.class.getCanonicalName();
@@ -23,12 +25,13 @@ public class CameraActivity extends AppCompatActivity {
         setContentView(R.layout.activity_camera);
 
         handler = Handler.getInstance(getApplicationContext(), this);
-        getSupportActionBar().setTitle("Camera");
+        Objects.requireNonNull(getSupportActionBar()).setTitle("Camera");
 
         cameraLogoutBtn = (Button) findViewById(R.id.cameraLogoutBtn);
         cameraLogoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                disableInteraction();
                 logout();
             }
         });
@@ -41,6 +44,13 @@ public class CameraActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+    }
+
+    /**
+     * disable interaction with activity
+     */
+    public void disableInteraction(){
+        cameraLogoutBtn.setEnabled(false);
     }
 
     /**
