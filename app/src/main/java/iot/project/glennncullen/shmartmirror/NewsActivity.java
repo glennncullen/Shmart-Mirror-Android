@@ -54,6 +54,7 @@ public class NewsActivity extends AppCompatActivity {
 
     // update based on callback from pi
     public void update(JSONObject message){
+        if(!message.has("link")) return;
         try {
             newsWebView.loadUrl((String) message.get("link"));
         } catch (JSONException e) {
@@ -70,6 +71,7 @@ public class NewsActivity extends AppCompatActivity {
      * disable interaction with activity
      */
     public void disableInteraction(){
+        newsWebView.loadUrl("about:blank");
         newsLogoutBtn.setEnabled(false);
     }
 

@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -63,13 +64,13 @@ public class NotesActivity extends AppCompatActivity {
         firebaseDB = FirebaseDatabase.getInstance();
         databaseRef = firebaseDB.getReference();
 
-        notesListView = (ListView) findViewById(R.id.notesListview);
+        notesListView = findViewById(R.id.notesListview);
         notesAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, notesList);
-        notesEditText = (EditText) findViewById(R.id.notesEditText);
+        notesEditText = findViewById(R.id.notesEditText);
         notesEditText.setHint("Write Note");
         notesListView.setAdapter(notesAdapter);
 
-        postNoteBtn = (Button) findViewById(R.id.postNoteBtn);
+        postNoteBtn = findViewById(R.id.postNoteBtn);
         postNoteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -81,12 +82,14 @@ public class NotesActivity extends AppCompatActivity {
                     if (!note.equals("")) {
                         databaseRef.push().setValue(note);
                         try {
-                            handler.publish(new JSONObject().put("new", 1), "/iotappdev/pi/notes/new/");
+                            Handler.publish(new JSONObject().put("new", 1), "/iotappdev/pi/notes/new/");
                         } catch (JSONException e) {
                             Log.e(LOG_TAG, "Unable to create JSONObject for new notes");
                             e.printStackTrace();
                         }
                         notesEditText.setText("");
+                        InputMethodManager imm = (InputMethodManager)getSystemService(getApplicationContext().INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(notesEditText.getWindowToken(), 0);
                     }
                 }
             }
@@ -105,7 +108,7 @@ public class NotesActivity extends AppCompatActivity {
                                 Log.i(LOG_TAG, "\nKey:\t" + notesKeyList.get(position) + "\nValue:\t" + notesList.get(position));
                                 firebaseDB.getReference(notesKeyList.get(position)).setValue(null);
                                 try {
-                                    handler.publish(new JSONObject().put("new", 1), "/iotappdev/pi/notes/new/");
+                                    Handler.publish(new JSONObject().put("new", 1), "/iotappdev/pi/notes/new/");
                                 } catch (JSONException e) {
                                     Log.e(LOG_TAG, "Unable to create JSONObject for new notes");
                                     e.printStackTrace();
@@ -142,7 +145,7 @@ public class NotesActivity extends AppCompatActivity {
             }
         });
 
-        notesLogoutBtn = (Button) findViewById(R.id.notesLogoutBtn);
+        notesLogoutBtn = findViewById(R.id.notesLogoutBtn);
         notesLogoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -178,7 +181,7 @@ public class NotesActivity extends AppCompatActivity {
      */
     private void logout(){
         try {
-            handler.publish(new JSONObject().put("logout", 1), "/iotappdev/logout/");
+            Handler.publish(new JSONObject().put("logout", 1), "/iotappdev/logout/");
         } catch (JSONException e) {
             Log.e(LOG_TAG, "Unable to create JSONObject for logout");
             e.printStackTrace();

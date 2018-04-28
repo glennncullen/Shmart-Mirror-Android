@@ -65,11 +65,12 @@ public class WeatherActivity extends AppCompatActivity {
 
         Log.i(LOG_TAG, getClass().getSimpleName() + " instance:\t" + this.toString());
 
-    }
+    } // END OF CREATE
 
 
     // update based on callback from pi
     public void update(JSONObject message){
+        if(!message.has("temperature")) return;
         Log.i(LOG_TAG, "Trying to update weather with: " + message.toString());
         try {
             weatherTempLbl.setText((String) String.valueOf(message.get("temperature")));

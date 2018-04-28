@@ -3,6 +3,7 @@
     package="iot.project.glennncullen.shmartmirror">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"

@@ -165,7 +165,7 @@ public class Handler {
                                             case "WeatherActivity":
                                                 ((WeatherActivity) activityInFocus).update(receivedJson);
                                                 break;
-                                            case "CameraAvtivity":
+                                            case "CameraActivity":
                                                 ((CameraActivity) activityInFocus).update(receivedJson);
                                                 break;
                                             default:
@@ -207,22 +207,6 @@ public class Handler {
                                 JSONObject receivedJson = null;
                                 try {
                                     receivedJson = new JSONObject(new String(data, "UTF-8"));
-                                    switch((String) receivedJson.get("display")){
-                                        case "NotesFeed":
-                                            activityInFocus.startActivity(new Intent(context ,NotesActivity.class));
-                                            break;
-                                        case "WeatherFeed":
-                                            activityInFocus.startActivity(new Intent(context ,WeatherActivity.class));
-                                            break;
-                                        case "NewsFeed":
-                                            activityInFocus.startActivity(new Intent(context ,NewsActivity.class));
-                                            break;
-                                        case "CameraFeed":
-                                            activityInFocus.startActivity(new Intent(context ,CameraActivity.class));
-                                            break;
-                                        default:
-                                            break;
-                                    }
                                     switch(activityInFocus.getClass().getSimpleName()){
                                         case "NotesActivity":
                                             ((NotesActivity) activityInFocus).disableInteraction();
@@ -235,6 +219,22 @@ public class Handler {
                                             break;
                                         case "CameraAvtivity":
                                             ((CameraActivity) activityInFocus).disableInteraction();
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                    switch((String) receivedJson.get("display")){
+                                        case "NotesFeed":
+                                            activityInFocus.startActivity(new Intent(context ,NotesActivity.class));
+                                            break;
+                                        case "WeatherFeed":
+                                            activityInFocus.startActivity(new Intent(context ,WeatherActivity.class));
+                                            break;
+                                        case "NewsFeed":
+                                            activityInFocus.startActivity(new Intent(context ,NewsActivity.class));
+                                            break;
+                                        case "CameraFeed":
+                                            activityInFocus.startActivity(new Intent(context ,CameraActivity.class));
                                             break;
                                         default:
                                             break;
@@ -377,6 +377,8 @@ public class Handler {
                         subscribeToTopic("/iotappdev/android/auth/");
                         subscribeToTopic("/iotappdev/weather/day/");
                         subscribeToTopic("/iotappdev/logout/");
+
+                        subscribeToTopic("/iotappdev/android/camera/newpic/");
                         subscribeToDisplays();
                     }
                 }

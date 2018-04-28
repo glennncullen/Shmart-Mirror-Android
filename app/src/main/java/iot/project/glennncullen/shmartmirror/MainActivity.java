@@ -100,6 +100,7 @@ public class MainActivity extends AppCompatActivity{
 
     // update based on callback from pi
     public void update(JSONObject message){
+        if(!message.has("auth")) return;
         try {
             if(message.get("auth").equals("authorised")){
                 handler.changeAuthorisation();
