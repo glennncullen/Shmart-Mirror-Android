@@ -37,6 +37,7 @@ import java.util.UUID;
 
 public class Handler {
 
+    // static variables for Handler class
     private static Handler handler;
     private static Context context;
     private static AppCompatActivity activityInFocus;
@@ -59,15 +60,16 @@ public class Handler {
     // Certificate and key aliases in the KeyStore
     private static final String CERTIFICATE_ID = "default";
 
+    // variables for AWS connection
     private static AWSIotClient myIotAndroidClient;
     private static AWSIotMqttManager myMQTTManager;
     private static String keystorePath;
     private static String keystoreName;
     private static String keystorePassword;
-
     private static KeyStore clientKeyStore = null;
     private static String certificateId;
 
+    // booleans to control funcitonality
     private static boolean isConnected;
     private static boolean isAuthorisedByMirror;
 
@@ -190,7 +192,10 @@ public class Handler {
     /**
      * Subscribes to /iotappdev/displays/
      * handles incoming data and starts relevant activities
-     * as user switches between displays on the mirror
+     * as user switches between displays on the mirror.
+     *
+     * when switching, call disableInteraction() on
+     * current display
      *
      * disables inetraction with current activity
      * while next activity is starting

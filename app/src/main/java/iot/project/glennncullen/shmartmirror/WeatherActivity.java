@@ -17,12 +17,14 @@ import java.util.Objects;
 
 public class WeatherActivity extends AppCompatActivity {
 
-    static final String LOG_TAG = WeatherActivity.class.getCanonicalName();
+    // string for debug
+    static final String LOG_TAG = NewsActivity.class.getCanonicalName();
 
+    // singleton Handler
     private Handler handler;
 
+    // View components
     Button weatherLogoutBtn;
-
     TextView weatherDayLbl;
     TextView weatherTempLbl;
     TextView weatherDescriptionLbl;
@@ -31,10 +33,10 @@ public class WeatherActivity extends AppCompatActivity {
     TextView windDirectionLbl;
     ImageView weatherImg;
 
+    // Strings for icon display and day
     String icon;
     String day;
 
-//    JSONObject weather;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -42,9 +44,11 @@ public class WeatherActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
 
+        // get instance of Handler singleton and set title of actionbar to Weather
         handler = Handler.getInstance(getApplicationContext(), this);
         Objects.requireNonNull(getSupportActionBar()).setTitle("Weather");
 
+        // when weatherLogoutBtn is clicked, disableInteraction() and logout()
         weatherLogoutBtn = (Button) findViewById(R.id.weatherLogoutBtn);
         weatherLogoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -54,21 +58,29 @@ public class WeatherActivity extends AppCompatActivity {
             }
         });
 
+        // initialise components
         weatherDayLbl = (TextView) findViewById(R.id.weatherDayLbl);
         weatherTempLbl = (TextView) findViewById(R.id.weatherTempLbl);
         weatherDescriptionLbl = (TextView) findViewById(R.id.weatherDescriptionLbl);
         weatherLocationLbl = (TextView) findViewById(R.id.weatherLocationLbl);
         windSpeedLbl = (TextView) findViewById(R.id.windSpeedLbl);
         windDirectionLbl = (TextView) findViewById(R.id.windDirectionLbl);
-
         weatherImg = (ImageView) findViewById(R.id.weatherImg);
-
-        Log.i(LOG_TAG, getClass().getSimpleName() + " instance:\t" + this.toString());
 
     } // END OF CREATE
 
 
-    // update based on callback from pi
+    /**
+     * if message doesn't contain 'temperature' field, then return.
+     * using message json, build components of cardView using the
+     * information provided.
+     *
+     * Expand on day from three letters to full words.
+     *
+     * choose correct image based on icon in message.
+     *
+     * @param message json object from subscribe
+     */
     public void update(JSONObject message){
         if(!message.has("temperature")) return;
         Log.i(LOG_TAG, "Trying to update weather with: " + message.toString());
@@ -172,6 +184,7 @@ public class WeatherActivity extends AppCompatActivity {
         }
     }
 
+    // on back button pressed, do nothing
     @Override
     public void onBackPressed(){
     }
@@ -184,7 +197,7 @@ public class WeatherActivity extends AppCompatActivity {
     }
 
     /**
-     * handle logout event
+     * handle logout event by publishing logout
      */
     private void logout(){
         try {

@@ -49,8 +49,10 @@ public class MainActivity extends AppCompatActivity{
     // set log tag to underlying class name for debug
     static final String LOG_TAG = MainActivity.class.getCanonicalName();
 
+    // instance of Handler
     private Handler handler;
 
+    // View components
     EditText authNumTxt;
     Button mainLogoutBtn;
 
@@ -59,9 +61,11 @@ public class MainActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // get instance of singleton Handler
         handler = Handler.getInstance(getApplicationContext(), this);
         Objects.requireNonNull(getSupportActionBar()).setTitle("Shmart Mirror Authorisation");
 
+        // when logout button is pressed, call disableInteraction() and logout()
         mainLogoutBtn = (Button) findViewById(R.id.mainLogoutBtn);
         mainLogoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -71,6 +75,8 @@ public class MainActivity extends AppCompatActivity{
             }
         });
 
+        // when six digits have been entered into authNum edit text
+        // automatically publish them to AWS and clear edit text
         authNumTxt = (EditText) findViewById(R.id.authNumTxt);
         authNumTxt.addTextChangedListener(new TextWatcher() {
             @Override
@@ -98,14 +104,17 @@ public class MainActivity extends AppCompatActivity{
     } // END OF ON CREATE
 
 
-    // update based on callback from pi
+    /**
+     * if the message received shows authorisation then
+     * call the handler's changeAuthorisation() method
+     *
+     * @param message json object received for subscribe
+     */
     public void update(JSONObject message){
         if(!message.has("auth")) return;
         try {
             if(message.get("auth").equals("authorised")){
                 handler.changeAuthorisation();
-    //            authNumTxt.setVisibility(View.INVISIBLE);
-    //            findViewById(R.id.authNumLbl).setVisibility(View.INVISIBLE);
             }else{
                 Log.i(LOG_TAG, "unable to authorise connection to mirror");
             }
@@ -116,7 +125,7 @@ public class MainActivity extends AppCompatActivity{
     }
 
 
-
+    // on back button pressed, do nothing
     @Override
     public void onBackPressed(){
     }
@@ -131,7 +140,7 @@ public class MainActivity extends AppCompatActivity{
 
 
     /**
-     * handle logout event
+     * handle logout event by publishing logout
      */
     private void logout(){
         try {

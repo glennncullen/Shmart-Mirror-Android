@@ -39,18 +39,23 @@ import java.util.Objects;
 
 public class CameraActivity extends AppCompatActivity {
 
-    static final String LOG_TAG = CameraActivity.class.getCanonicalName();
+    // string for debug
+    static final String LOG_TAG = NewsActivity.class.getCanonicalName();
 
+    // singleton Handler
     private Handler handler;
 
+    // firebase cloud storage
     FirebaseStorage firebaseStorage;
     StorageReference storageReference;
 
+    // view components
     ImageView cameraImageView;
     Button cameraLogoutBtn;
     Button cameraSaveBtn;
     Button cameraDiscardBtn;
 
+    // Bitmap object to track current picture
     Bitmap currentPic;
 
     @Override
@@ -58,15 +63,20 @@ public class CameraActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
 
+        // get instance of Handler singleton and set title of actionbar to Camera
         handler = Handler.getInstance(getApplicationContext(), this);
         Objects.requireNonNull(getSupportActionBar()).setTitle("Camera");
 
+        // initialise components
         cameraImageView = (ImageView) findViewById(R.id.cameraImageView);
 
+        // initialise storage
         firebaseStorage = FirebaseStorage.getInstance();
 
-
-
+        // cameraSaveBtn is not enabled until a picture is present.
+        // when cameraSaveBtn is pressed, get permission to write to external storage,
+        // then save picture in the gallery, remove picture from imageview, disable save
+        // and discard buttons
         cameraSaveBtn = (Button) findViewById(R.id.cameraSaveBtn);
         cameraSaveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -79,10 +89,6 @@ public class CameraActivity extends AppCompatActivity {
                             new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                             MY_PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE);
                 }else{
-//                    getApplicationContext().sendBroadcast(new Intent(
-//                            Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
-//                            Uri.parse(MediaStore.Images.Media.insertImage(getApplicationContext().getContentResolver(), currentPic, "test", "test"))
-//                    ));
                     MediaStore.Images.Media.insertImage(getApplicationContext().getContentResolver(), currentPic, "test", "test");
                     Toast.makeText(getApplicationContext(), "Saved", Toast.LENGTH_SHORT).show();
                     cameraImageView.setImageDrawable(getApplicationContext().getDrawable(android.R.drawable.gallery_thumb));
@@ -93,7 +99,9 @@ public class CameraActivity extends AppCompatActivity {
         });
         cameraSaveBtn.setEnabled(false);
 
-
+        // cameraDiscardBtn is not enabled until a picture is present
+        // when cameraDiscardBtn is pressed, remove picture from imageview
+        // and disable the save and discard buttons
         cameraDiscardBtn = (Button) findViewById(R.id.cameraDiscardBtn);
         cameraDiscardBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -106,7 +114,7 @@ public class CameraActivity extends AppCompatActivity {
         });
         cameraDiscardBtn.setEnabled(false);
 
-
+        // when cameraLogoutBtn is pressed, diableInteraction() and logout()
         cameraLogoutBtn = (Button) findViewById(R.id.cameraLogoutBtn);
         cameraLogoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -117,7 +125,18 @@ public class CameraActivity extends AppCompatActivity {
         });
     }// END OF CREATE
 
-    // update based on callback from pi
+
+    /**
+     * if message does not have pic_name field, then do nothing.
+     *
+     * us the pic_name to get the reference to the image in the database,
+     * then download the image, store it in the currentPic Bitmap and
+     * display it in imageview. Enable the save and disable buttons.
+     *
+     * Delete the incoming image from firebase.
+     *
+     * @param message json object from subscribe
+     */
     public void update(JSONObject message) {
         if(!message.has("pic_name")) return;
         try {
@@ -148,6 +167,7 @@ public class CameraActivity extends AppCompatActivity {
         });
     }
 
+    // on back button pressed, do nothing
     @Override
     public void onBackPressed() {
     }
@@ -163,7 +183,7 @@ public class CameraActivity extends AppCompatActivity {
     }
 
     /**
-     * handle logout event
+     * handle logout event by publishing logout
      */
     private void logout(){
         try {

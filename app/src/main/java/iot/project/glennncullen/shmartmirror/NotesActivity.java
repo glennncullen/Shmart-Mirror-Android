@@ -36,11 +36,11 @@ import java.util.Objects;
 
 public class NotesActivity extends AppCompatActivity {
 
-    // static objects
+    // static objects for handler and debug
     static final String LOG_TAG = NotesActivity.class.getCanonicalName();
     private Handler handler;
 
-    // layout objects
+    // layout components
     Button notesLogoutBtn;
     Button postNoteBtn;
     EditText notesEditText;
@@ -58,18 +58,25 @@ public class NotesActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notes);
 
+        // get instance of handler and set title of actionbar to Notes
         handler = Handler.getInstance(getApplicationContext(), this);
         Objects.requireNonNull(getSupportActionBar()).setTitle("Notes");
 
+        // get instance of firebase and reference the database
         firebaseDB = FirebaseDatabase.getInstance();
         databaseRef = firebaseDB.getReference();
 
+        // initialise components
         notesListView = findViewById(R.id.notesListview);
         notesAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, notesList);
         notesEditText = findViewById(R.id.notesEditText);
         notesEditText.setHint("Write Note");
         notesListView.setAdapter(notesAdapter);
 
+        // when postNoteBtn is clicked, check that there are less than 5 notes
+        // if notesEditText is not empty, push note to firebase database
+        // publish 'new' to /iotappdev/pi/notes/new/
+        // hide soft keyboard
         postNoteBtn = findViewById(R.id.postNoteBtn);
         postNoteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,6 +102,9 @@ public class NotesActivity extends AppCompatActivity {
             }
         });
 
+        // when an item in the notes list is selected, ask user if they want to delete note
+        // if yes, delete note from firebase and publish 'new' to /iotappdev/pi/notes/new/
+        // if no, cancel the dialog box and do nothing
         notesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
@@ -126,6 +136,8 @@ public class NotesActivity extends AppCompatActivity {
             }
         });
 
+        // add listener to firebase database
+        // when there is any change in the database, update the notes list
         databaseRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -145,6 +157,7 @@ public class NotesActivity extends AppCompatActivity {
             }
         });
 
+        // when notesLogoutBtn is clicked,, disableInteraction() and logout()
         notesLogoutBtn = findViewById(R.id.notesLogoutBtn);
         notesLogoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -156,11 +169,17 @@ public class NotesActivity extends AppCompatActivity {
 
     }
 
-    // update based on callback from pi
+    /**
+     * when update method is called, do nothing as any changes in
+     * the daat is handled by the database change listener
+     *
+     * @param message json object from subscribe
+     */
     public void update(JSONObject message){
 
     }
 
+    // on back button pressed, do nothing
     @Override
     public void onBackPressed(){
     }
@@ -177,7 +196,7 @@ public class NotesActivity extends AppCompatActivity {
 
 
     /**
-     * handle logout event
+     * handle logout event by publishing logout
      */
     private void logout(){
         try {
